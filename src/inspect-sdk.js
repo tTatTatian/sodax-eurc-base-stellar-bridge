@@ -40,7 +40,7 @@ if (!baseToken || !stellarToken) {
   const baseToStellar = sodax.bridge.isBridgeable({ from: baseToken, to: stellarToken });
   const stellarToBase = sodax.bridge.isBridgeable({ from: stellarToken, to: baseToken });
 
-  console.log('\n=== Compatibility (same hub vault) ===');
+  console.log('\n=== EURC compatibility (same hub vault) ===');
   console.log('Base -> Stellar isBridgeable:', baseToStellar);
   console.log('Stellar -> Base isBridgeable:', stellarToBase);
 
@@ -49,7 +49,7 @@ if (!baseToken || !stellarToken) {
     sodax.bridge.getBridgeableTokens(STELLAR, BASE, STELLAR_EURC_ADDRESS),
   ];
 
-  console.log('\n=== Destination tokens returned by SDK ===');
+  console.log('\n=== EURC destination tokens returned by SDK ===');
   console.log('Base EURC -> Stellar:', JSON.stringify(baseDestinations, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2));
   console.log('Stellar EURC -> Base:', JSON.stringify(stellarDestinations, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2));
 
@@ -58,7 +58,7 @@ if (!baseToken || !stellarToken) {
   console.log('Fee on 1.0 EURC-equivalent in 18-decimal hub units:', sodax.bridge.getFee(10n ** 18n).toString());
 
   if (baseToStellar && stellarToBase) {
-    console.log('\n=== Capacity reads ===');
+    console.log('\n=== EURC capacity reads ===');
     const [forward, reverse] = await Promise.all([
       sodax.bridge.getBridgeableAmount(baseToken, stellarToken),
       sodax.bridge.getBridgeableAmount(stellarToken, baseToken),
@@ -66,8 +66,35 @@ if (!baseToken || !stellarToken) {
     console.log('Base -> Stellar capacity:', JSON.stringify(forward, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2));
     console.log('Stellar -> Base capacity:', JSON.stringify(reverse, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2));
   } else {
-    console.log('\nCapacity reads skipped: SDK compatibility check failed in at least one direction.');
+    console.log('\nEURC capacity reads skipped: SDK compatibility check failed in at least one direction.');
   }
+}
+
+// USDC is checked only as a possible intermediate route. This is not an EURC bridge.
+const baseUsdc = config.chains?.[BASE]?.supportedTokens?.USDC;
+const stellarUsdc = config.chains?.[STELLAR]?.supportedTokens?.USDC;
+
+console.log('\n=== Optional USDC intermediate bridge check (read-only) ===');
+console.log(JSON.stringify({ baseUsdc, stellarUsdc }, null, 2));
+
+if (baseUsdc && stellarUsdc) {
+  const baseToStellarUsdc = sodax.bridge.isBridgeable({ from: baseUsdc, to: stellarUsdc });
+  const stellarToBaseUsdc = sodax.bridge.isBridgeable({ from: stellarUsdc, to: baseUsdc });
+  console.log('Base USDC -> Stellar USDC isBridgeable:', baseToStellarUsdc);
+  console.log('Stellar USDC -> Base USDC isBridgeable:', stellarToBaseUsdc);
+
+  if (baseToStellarUsdc && stellarToBaseUsdc) {
+    const [forward, reverse] = await Promise.all([
+      sodax.bridge.getBridgeableAmount(baseUsdc, stellarUsdc),
+      sodax.bridge.getBridgeableAmount(stellarUsdc, baseUsdc),
+    ]);
+    console.log('Base -> Stellar USDC capacity:', JSON.stringify(forward, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2));
+    console.log('Stellar -> Base USDC capacity:', JSON.stringify(reverse, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2));
+  } else {
+    console.log('USDC capacity reads skipped: compatibility check failed.');
+  }
+} else {
+  console.log('USDC intermediate check skipped: USDC missing from one or both SDK configs.');
 }
 
 console.log('\nSafety: read-only configuration, compatibility, fee and capacity checks only.');
