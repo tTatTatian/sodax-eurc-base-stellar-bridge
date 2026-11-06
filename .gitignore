@@ -1,2 +1,11 @@
-node_modules
+# Private environment files
 .env
+.env.*
+!.env.example
+
+# Dependencies and local output
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
