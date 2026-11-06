@@ -1,7 +1,13 @@
 {
-  "name": "node-starter",
+  "name": "sodax-eurc-base-stellar-bridge",
+  "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "description": "Read-only SODAX Base ↔ Stellar EURC bridge diagnostics",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "inspect:sdk": "node src/inspect-sdk.js"
+  },
+  "dependencies": {
+    "@sodax/sdk": "2.2.0"
   }
 }
