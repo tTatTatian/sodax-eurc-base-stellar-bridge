@@ -56,7 +56,6 @@ if (!baseToken || !stellarToken) {
   console.log('\n=== Partner fee configuration ===');
   console.log('Configured bridge partner fee:', JSON.stringify(sodax.config.bridgePartnerFee ?? null, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2));
   console.log('Fee on 1.0 EURC-equivalent in 18-decimal hub units:', sodax.bridge.getFee(10n ** 18n).toString());
-  console.log('Fee with explicit no-fee override (undefined):', sodax.bridge.getFee(10n ** 18n, undefined).toString());
 
   if (baseToStellar && stellarToBase) {
     console.log('\n=== Capacity reads ===');
